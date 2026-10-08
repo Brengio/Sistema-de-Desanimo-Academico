@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% block title %}Painel | Sistema de Detecção de Desânimo Acadêmico{% endblock %}
+{% block content %}
+<section class="page-heading dashboard-heading">
+    <div>
+        <p class="eyebrow">VISÃO GERAL</p>
+        <h2>Painel de acompanhamento</h2>
+        <p class="lead">Indicadores consolidados das avaliações acadêmicas registradas.</p>
+    </div>
+    <div class="notice-chip">{{ system_notice }}</div>
+</section>
+
+<section class="metrics-grid" aria-label="Indicadores principais">
+    <article class="metric-card metric-total">
+        <p>Total de avaliações</p>
+        <strong id="metric-total">{{ metrics.total }}</strong>
+        <span>Registros disponíveis</span>
+    </article>
+    <article class="metric-card metric-low">
+        <p>Baixo risco</p>
+        <strong id="metric-low">{{ metrics.risk_counts['Baixo'] }}</strong>
+        <span>Indicadores reduzidos</span>
+    </article>
+    <article class="metric-card metric-medium">
+        <p>Médio risco</p>
+        <strong id="metric-medium">{{ metrics.risk_counts['Médio'] }}</strong>
+        <span>Acompanhamento sugerido</span>
+    </article>
+    <article class="metric-card metric-high">
+        <p>Alto risco</p>
+        <strong id="metric-high">{{ metrics.risk_counts['Alto'] }}</strong>
+        <span>Maior atenção acadêmica</span>
+    </article>
+</section>
+
+<section class="action-banner">
+    <div>
+        <p class="eyebrow">NOVO REGISTRO</p>
+        <h3>Registre uma avaliação contextual e textual.</h3>
+        <p>O resultado é calculado por regras explícitas, preservando transparência metodológica.</p>
+    </div>
+    <a class="btn btn-light btn-lg" href="{{ url_for('assessment.new_assessment') }}">Nova avaliação</a>
+</section>
+
+<section class="chart-grid">
+    <article class="panel chart-panel">
+        <div class="panel-heading">
+            <div><p class="eyebrow">GRÁFICO 01</p><h3>Distribuição dos níveis de risco</h3></div>
+        </div>
+        <div class="chart-wrap doughnut-wrap"><canvas id="riskChart" aria-label="Distribuição dos níveis de risco"></canvas></div>
+    </article>
+    <article class="panel chart-panel">
+        <div class="panel-heading">
+            <div><p class="eyebrow">GRÁFICO 02</p><h3>Polaridade das respostas</h3></div>
+        </div>
+        <div class="chart-wrap doughnut-wrap"><canvas id="polarityChart" aria-label="Distribuição de polaridade"></canvas></div>
+    </article>
+    <article class="panel chart-panel chart-wide">
+        <div class="panel-heading">
+            <div><p class="eyebrow">GRÁFICO 03</p><h3>Níveis de risco por curso</h3></div>
+        </div>
+        <div class="chart-wrap"><canvas id="courseChart" aria-label="Níveis de risco por curso"></canvas></div>
+    </article>
+    <article class="panel chart-panel chart-wide">
+        <div class="panel-heading">
+            <div><p class="eyebrow">GRÁFICO 04</p><h3>Registros por semestre</h3></div>
+        </div>
+        <div class="chart-wrap"><canvas id="semesterChart" aria-label="Quantidade de registros por semestre"></canvas></div>
+    </article>
+</section>
+
+<section class="panel recent-panel">
+    <div class="panel-heading">
+        <div><p class="eyebrow">ATIVIDADE RECENTE</p><h3>Últimas avaliações registradas</h3></div>
+        <a href="{{ url_for('dashboard.history') }}" class="text-link">Ver histórico completo</a>
+    </div>
+    <div class="table-responsive">
+        <table class="table align-middle mb-0">
+            <thead><tr><th>ID</th><th>Curso</th><th>Semestre</th><th>Polaridade</th><th>Pontuação</th><th>Nível</th><th></th></tr></thead>
+            <tbody>
+            {% for assessment in metrics.recent_assessments %}
+                <tr>
+                    <td>#{{ assessment.id }}</td><td>{{ assessment.course }}</td><td>{{ assessment.semester }}º</td>
+                    <td><span class="polarity polarity-{{ assessment.text_polarity }}">{{ assessment.text_polarity|polarity_label }}</span></td>
+                    <td>{{ assessment.total_score }}/10</td><td><span class="risk-badge {{ assessment.risk_level|risk_class }}">{{ assessment.risk_level }} risco</span></td>
+                    <td><a class="table-link" href="{{ url_for('assessment.detail', assessment_id=assessment.id) }}">Detalhes</a></td>
+                </tr>
+            {% else %}
+                <tr><td colspan="7" class="empty-row">Nenhuma avaliação registrada ainda.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<script>window.dashboardConfig = {{ metrics|tojson }};</script>
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}

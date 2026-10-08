@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% block title %}Nova Avaliação | Sistema de Detecção de Desânimo Acadêmico{% endblock %}
+{% block content %}
+<section class="page-heading">
+    <div>
+        <p class="eyebrow">COLETA DE INDICADORES</p>
+        <h2>Nova avaliação</h2>
+        <p class="lead">Preencha o contexto acadêmico e uma resposta textual curta para gerar o indicador computacional.</p>
+    </div>
+    <div class="notice-chip">{{ system_notice }}</div>
+</section>
+
+{% if errors %}
+<div class="alert alert-danger"><strong>Não foi possível concluir a análise:</strong><ul class="mb-0 mt-2">{% for error in errors %}<li>{{ error }}</li>{% endfor %}</ul></div>
+{% endif %}
+
+<form method="post" id="assessment-form" novalidate>
+    <section class="panel form-panel">
+        <div class="panel-heading"><div><p class="eyebrow">ETAPA 01</p><h3>Informações acadêmicas</h3></div></div>
+        <div class="row g-4">
+            <div class="col-md-7">
+                <label for="course" class="form-label">Curso <span aria-hidden="true">*</span></label>
+                <select class="form-select" id="course" name="course" required>
+                    <option value="">Selecione o curso</option>
+                    {% for course in courses %}<option value="{{ course }}" {% if form_data.get('course') == course %}selected{% endif %}>{{ course }}</option>{% endfor %}
+                </select>
+            </div>
+            <div class="col-md-5">
+                <label for="semester" class="form-label">Semestre <span aria-hidden="true">*</span></label>
+                <select class="form-select" id="semester" name="semester" required>
+                    <option value="">Selecione</option>
+                    {% for semester in semesters %}<option value="{{ semester }}" {% if form_data.get('semester') == semester|string %}selected{% endif %}>{{ semester }}º semestre</option>{% endfor %}
+                </select>
+            </div>
+        </div>
+    </section>
+
+    <section class="panel form-panel">
+        <div class="panel-heading"><div><p class="eyebrow">ETAPA 02</p><h3>Indicadores do contexto acadêmico</h3></div><span class="helper-text">Selecione uma opção por pergunta.</span></div>
+        <div class="question-stack">
+            <div class="question-row">
+                <label for="academic_workload">Como você considera sua carga de atividades acadêmicas? <span>*</span></label>
+                <select class="form-select" id="academic_workload" name="academic_workload" required>
+                    <option value="">Selecione uma opção</option>{% for value in ['Muito baixa','Baixa','Moderada','Alta','Muito alta'] %}<option value="{{ value }}" {% if form_data.get('academic_workload') == value %}selected{% endif %}>{{ value }}</option>{% endfor %}
+                </select>
+            </div>
+            <div class="question-row">
+                <label for="difficulty">Qual o nível de dificuldade para acompanhar as disciplinas? <span>*</span></label>
+                <select class="form-select" id="difficulty" name="difficulty" required>
+                    <option value="">Selecione uma opção</option>{% for value in ['Muito baixa','Baixa','Moderada','Alta','Muito alta'] %}<option value="{{ value }}" {% if form_data.get('difficulty') == value %}selected{% endif %}>{{ value }}</option>{% endfor %}
+                </select>
+            </div>
+            <div class="question-row">
+                <label for="satisfaction">Como você avalia sua satisfação com o curso? <span>*</span></label>
+                <select class="form-select" id="satisfaction" name="satisfaction" required>
+                    <option value="">Selecione uma opção</option>{% for value in ['Muito insatisfeito','Insatisfeito','Neutro','Satisfeito','Muito satisfeito'] %}<option value="{{ value }}" {% if form_data.get('satisfaction') == value %}selected{% endif %}>{{ value }}</option>{% endfor %}
+                </select>
+            </div>
+            <div class="question-row">
+                <label for="motivation">Como você avalia sua motivação para continuar o curso? <span>*</span></label>
+                <select class="form-select" id="motivation" name="motivation" required>
+                    <option value="">Selecione uma opção</option>{% for value in ['Muito baixa','Baixa','Moderada','Alta','Muito alta'] %}<option value="{{ value }}" {% if form_data.get('motivation') == value %}selected{% endif %}>{{ value }}</option>{% endfor %}
+                </select>
+            </div>
+        </div>
+    </section>
+
+    <section class="panel form-panel">
+        <div class="panel-heading"><div><p class="eyebrow">ETAPA 03</p><h3>Resposta textual</h3></div><span class="helper-text">Máximo de 1000 caracteres.</span></div>
+        <label for="text_response" class="form-label">Descreva brevemente como você está se sentindo atualmente em relação à sua vida acadêmica. <span>*</span></label>
+        <textarea class="form-control text-area" id="text_response" name="text_response" rows="6" maxlength="1000" minlength="10" required placeholder="Ex.: Tenho enfrentado algumas dificuldades nas disciplinas e estou me sentindo cansado com a quantidade de atividades.">{{ form_data.get('text_response', '') }}</textarea>
+        <div class="character-row"><span>Evite inserir informações pessoais identificáveis.</span><strong><span id="character-count">0</span>/1000</strong></div>
+    </section>
+
+    <div class="form-actions">
+        <a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-secondary">Cancelar</a>
+        <button class="btn btn-primary btn-lg" type="submit" id="analysis-submit">Analisar avaliação</button>
+    </div>
+</form>
+<div class="processing-overlay" id="processing-overlay" aria-live="polite" aria-hidden="true"><div><div class="spinner-border" role="status"></div><p>Processando indicadores e calculando classificação...</p></div></div>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='js/assessment.js') }}"></script>{% endblock %}

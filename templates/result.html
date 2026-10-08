@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block title %}Resultado da Análise | Sistema de Detecção de Desânimo Acadêmico{% endblock %}
+{% block content %}
+<section class="page-heading compact-heading">
+    <div><p class="eyebrow">ANÁLISE CONCLUÍDA</p><h2>Resultado da análise</h2><p class="lead">Avaliação #{{ assessment.id }} registrada em {{ assessment.formatted_date }}.</p></div>
+    <a class="btn btn-outline-secondary" href="{{ url_for('assessment.new_assessment') }}">Nova avaliação</a>
+</section>
+
+<section class="result-hero {{ assessment.risk_level|risk_class }}">
+    <div><p>CLASSIFICAÇÃO COMPUTACIONAL</p><h3>{{ assessment.risk_level }} risco</h3><span>Resultado baseado na combinação de contexto acadêmico e polaridade textual.</span></div>
+    <div class="score-orb"><strong>{{ assessment.total_score }}</strong><span>/10</span></div>
+</section>
+
+<section class="result-grid">
+    <article class="panel score-panel"><p class="eyebrow">POLARIDADE</p><h3 class="polarity polarity-{{ assessment.text_polarity }}">{{ assessment.text_polarity|polarity_label }}</h3><p>A leitura lexical encontrou termos avaliados pela regra inicial.</p></article>
+    <article class="panel score-panel"><p class="eyebrow">PONTUAÇÃO CONTEXTUAL</p><h3>{{ assessment.contextual_score }} <small>pontos</small></h3><p>Contribuição dos quatro indicadores acadêmicos.</p></article>
+    <article class="panel score-panel"><p class="eyebrow">PONTUAÇÃO TEXTUAL</p><h3>{{ assessment.text_score }} <small>pontos</small></h3><p>Contribuição da polaridade da resposta.</p></article>
+</section>
+
+<section class="two-column-grid">
+    <article class="panel">
+        <div class="panel-heading"><div><p class="eyebrow">FATORES IDENTIFICADOS</p><h3>Elementos considerados</h3></div></div>
+        <ul class="factor-list">{% for factor in factors %}<li>{{ factor }}</li>{% endfor %}</ul>
+    </article>
+    <article class="panel disclaimer-panel">
+        <p class="eyebrow">INTERPRETAÇÃO RESPONSÁVEL</p><h3>Indicador de apoio acadêmico</h3>
+        <p>{{ system_notice }} O registro pode apoiar a observação pedagógica e a discussão sobre estratégias de aprendizagem, mas não substitui diálogo, acolhimento ou avaliação especializada quando necessária.</p>
+    </article>
+</section>
+
+<div class="form-actions result-actions"><a class="btn btn-outline-secondary" href="{{ url_for('dashboard.history') }}">Ver histórico</a><a class="btn btn-primary" href="{{ url_for('assessment.detail', assessment_id=assessment.id) }}">Ver detalhes completos</a></div>
+{% endblock %}

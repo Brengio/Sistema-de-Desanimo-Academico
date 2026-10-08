@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Sistema acadêmico de classificação computacional de indicadores de desânimo acadêmico.">
+    <title>{% block title %}Sistema de Detecção de Desânimo Acadêmico{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <div class="app-shell">
+        <aside class="sidebar" id="sidebar">
+            <div class="brand-block">
+                <div class="brand-mark">DA</div>
+                <div>
+                    <p class="brand-eyebrow">ACOMPANHAMENTO</p>
+                    <h1 class="brand-title">Desânimo<br>Acadêmico</h1>
+                </div>
+            </div>
+            <p class="sidebar-caption">Indicadores computacionais para apoio ao acompanhamento acadêmico.</p>
+            <nav class="main-nav" aria-label="Navegação principal">
+                <a href="{{ url_for('main.dashboard') }}" class="nav-link {% if request.endpoint == 'main.dashboard' %}active{% endif %}"><span>01</span>Painel</a>
+                <a href="{{ url_for('assessment.new_assessment') }}" class="nav-link {% if request.endpoint == 'assessment.new_assessment' %}active{% endif %}"><span>02</span>Nova Avaliação</a>
+                <a href="{{ url_for('dashboard.history') }}" class="nav-link {% if request.endpoint == 'dashboard.history' %}active{% endif %}"><span>03</span>Histórico</a>
+                <a href="{{ url_for('dashboard.simulated_data') }}" class="nav-link {% if request.endpoint == 'dashboard.simulated_data' %}active{% endif %}"><span>04</span>Dados Simulados</a>
+                <a href="{{ url_for('dashboard.validation') }}" class="nav-link {% if request.endpoint == 'dashboard.validation' %}active{% endif %}"><span>05</span>Validação</a>
+                <a href="{{ url_for('dashboard.reports') }}" class="nav-link {% if request.endpoint == 'dashboard.reports' %}active{% endif %}"><span>06</span>Relatórios</a>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="{{ url_for('main.about') }}">Sobre o sistema</a>
+                <small>Versão acadêmica 1.0</small>
+            </div>
+        </aside>
+
+        <div class="content-area">
+            <header class="mobile-header">
+                <button class="menu-toggle" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileNavigation" aria-label="Abrir menu">Menu</button>
+                <span>Desânimo Acadêmico</span>
+            </header>
+            <main class="page-content">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+                {% block content %}{% endblock %}
+            </main>
+        </div>
+    </div>
+
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="mobileNavigation" aria-labelledby="mobileNavigationLabel">
+        <div class="offcanvas-header">
+            <h2 class="h5 mb-0" id="mobileNavigationLabel">Navegação</h2>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Fechar"></button>
+        </div>
+        <div class="offcanvas-body p-0">
+            <nav class="mobile-nav">
+                <a href="{{ url_for('main.dashboard') }}">Painel</a>
+                <a href="{{ url_for('assessment.new_assessment') }}">Nova Avaliação</a>
+                <a href="{{ url_for('dashboard.history') }}">Histórico</a>
+                <a href="{{ url_for('dashboard.simulated_data') }}">Dados Simulados</a>
+                <a href="{{ url_for('dashboard.validation') }}">Validação</a>
+                <a href="{{ url_for('dashboard.reports') }}">Relatórios</a>
+                <a href="{{ url_for('main.about') }}">Sobre o sistema</a>
+            </nav>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

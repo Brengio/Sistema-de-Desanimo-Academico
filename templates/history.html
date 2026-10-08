@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block title %}Histórico | Sistema de Detecção de Desânimo Acadêmico{% endblock %}
+{% block content %}
+<section class="page-heading compact-heading"><div><p class="eyebrow">REGISTROS ARMAZENADOS</p><h2>Histórico de avaliações</h2><p class="lead">Consulte, pesquise e filtre os resultados já processados.</p></div><a class="btn btn-primary" href="{{ url_for('assessment.new_assessment') }}">Nova avaliação</a></section>
+
+<section class="panel filter-panel">
+    <form method="get" class="filter-form">
+        <div class="search-group"><label for="search">Busca</label><input class="form-control" id="search" name="search" value="{{ filters.search }}" placeholder="ID, curso ou texto"></div>
+        <div><label for="course-filter">Curso</label><select class="form-select" id="course-filter" name="course"><option value="">Todos</option>{% for course in courses %}<option value="{{ course }}" {% if filters.course == course %}selected{% endif %}>{{ course }}</option>{% endfor %}</select></div>
+        <div><label for="semester-filter">Semestre</label><select class="form-select" id="semester-filter" name="semester"><option value="">Todos</option>{% for semester in semesters %}<option value="{{ semester }}" {% if filters.semester == semester|string %}selected{% endif %}>{{ semester }}º</option>{% endfor %}</select></div>
+        <div><label for="risk-filter">Nível de risco</label><select class="form-select" id="risk-filter" name="risk_level"><option value="">Todos</option>{% for level in risk_levels %}<option value="{{ level }}" {% if filters.risk_level == level %}selected{% endif %}>{{ level }}</option>{% endfor %}</select></div>
+        <div class="filter-buttons"><button class="btn btn-primary" type="submit">Aplicar filtros</button><a class="btn btn-outline-secondary" href="{{ url_for('dashboard.history') }}">Limpar</a></div>
+    </form>
+</section>
+
+<section class="panel table-panel"><div class="panel-heading"><div><p class="eyebrow">{{ assessments|length }} RESULTADO(S)</p><h3>Lista de avaliações</h3></div></div>
+<div class="table-responsive"><table class="table align-middle history-table"><thead><tr><th>ID</th><th>Curso</th><th>Semestre</th><th>Data</th><th>Polaridade</th><th>Pontuação</th><th>Risco</th><th></th></tr></thead><tbody>
+{% for assessment in assessments %}<tr><td>#{{ assessment.id }}</td><td>{{ assessment.course }}</td><td>{{ assessment.semester }}º</td><td class="date-cell">{{ assessment.formatted_date }}</td><td><span class="polarity polarity-{{ assessment.text_polarity }}">{{ assessment.text_polarity|polarity_label }}</span></td><td>{{ assessment.total_score }}/10</td><td><span class="risk-badge {{ assessment.risk_level|risk_class }}">{{ assessment.risk_level }}</span></td><td><a class="btn btn-sm btn-outline-primary" href="{{ url_for('assessment.detail', assessment_id=assessment.id) }}">Ver detalhes</a></td></tr>
+{% else %}<tr><td colspan="8" class="empty-row">Nenhuma avaliação corresponde aos filtros informados.</td></tr>{% endfor %}
+</tbody></table></div></section>
+{% endblock %}
